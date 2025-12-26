@@ -1,0 +1,16 @@
+<generator>
+	<name>Genblc</name>
+	<m2m name="design2class.qvto"/>
+	<m2m name="seq2Testclass.qvtr"/>
+	<m2m name="seq2Testseq.qvtr"/>
+	<m2t name="classdi2gobehavior.mtl"/>
+	<m2t name="classdi2goclass.mtl"/>
+	<m2t name="classdi2solbehavior.mtl"/>
+	<m2t name="classdi2solclass.mtl"/>
+	<m2t name="ethdeployment.mtl"/>
+	<m2t name="hfdeployment.mtl"/>
+	<m2t name="testgobehavior.mtl"/>
+	<m2t name="testgoclass.mtl"/>
+	<m2t name="testjsbehavior.mtl"/>
+	<m2t name="testjsclass.mtl"/>
+</generator>

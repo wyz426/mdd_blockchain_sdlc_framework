@@ -1,0 +1,56 @@
+[module generate('http://www.eclipse.org/uml2/5.0.0/UML')]
+
+[query public getStartTime(c : OclAny) : String =
+invoke('org.eclipse.acceleo.module.solandfab.main.GenerationSupport', 'getStartTime()', Sequence{}) /]
+[query public getEndTime(c : OclAny) : String =
+invoke('org.eclipse.acceleo.module.solandfab.main.GenerationSupport', 'getEndTime()', Sequence{}) /]
+
+[template public testseq2jsbehavior(aLifeline : Lifeline)]
+[if aLifeline.name.toString().startsWith('TComp_')]
+[file (aLifeline.name.replace('TComp_', '').concat('test.js'), false)]
+begintime [aLifeline.getStartTime()/]
+await instance.add[aLifeline.name.replace('TComp_', '')/]([aLifeline.name.replace('TComp_', '')/]Id, {from: ownerId});
+[for ( str : String | aLifeline.ancestors(Interaction).name.tokenize(',') )]
+var [str/] = DataPool_[aLifeline.ancestors(Interaction).name/].ds[str/]_[aLifeline.ancestors(Interaction).name/]();
+[/for]
+var expectedResult = DataPool_[aLifeline.ancestors(Interaction).name/].dsr_[aLifeline.ancestors(Interaction).name/]();
+await instance.[aLifeline.ancestors(Interaction).name.replace('test', '').replace('\\)', '')/], {from: [aLifeline.name.replace('TComp_', '')/]Id}); 
+[for ( aMsg : Message | aLifeline.ancestors(Interaction).message )]
+[if (aMsg.name.startsWith('fetch'))]
+[let fname : String = aMsg.name.strtok(':', 0).replace('\\)', '')]
+[let fres : String = aMsg.name.strtok(':', 1)]
+[let ffname : String = fname.strtok('\\(', 0)]
+[let fpara : String = fname.strtok('\\(', 1)]
+const [fres/] = await instance.[ffname/].call([fpara/])
+assert.equal([fres/] , expectedResult, 'Error result')
+[/let][/let][/let][/let]
+[/if]
+[/for]
+endtime [aLifeline.getEndTime()/]
+[/file]
+[/if]
+[/template]
+
+
+[template public soltestfetchitem(aLifeline : Lifeline)]
+[if aLifeline.name.toString()='ContractInterface']
+[file (aLifeline.name.concat('testseq.sol'), false)]
+[for ( aMsg : Message | aLifeline.ancestors(Interaction).message )]
+[let fname : String = aMsg.name.strtok(':', 0)]
+[let fres : String = aMsg.name.strtok(':', 1)]
+[if (fname.startsWith('PutState'))]
+[let getstatename : String = fres.strtok(',', 0)]
+[let getstateindex : String = fres.strtok(',', 1)]
+function fetch[getstatename/]([getstateindex/])public view returns (
+Food [fname.replace('PutState\\(', '').replace('\\)', '')/]) {
+    return (
+        getstatename['['/]getstateindex[']'/]
+    );
+}
+[/let][/let]
+[/if]
+[/let][/let]
+[/for]
+[/file]
+[/if]
+[/template]

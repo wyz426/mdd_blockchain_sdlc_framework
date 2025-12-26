@@ -1,0 +1,43 @@
+[module generate('http://www.eclipse.org/uml2/5.0.0/UML')]
+
+[query public getStartTime(c : OclAny) : String =
+invoke('org.eclipse.acceleo.module.solandfab.main.GenerationSupport', 'getStartTime()', Sequence{}) /]
+[query public getEndTime(c : OclAny) : String =
+invoke('org.eclipse.acceleo.module.solandfab.main.GenerationSupport', 'getEndTime()', Sequence{}) /]
+
+[template public tosolclass(aModel: Model)]
+
+[file (aModel.name+'model.sol', false, 'UTF-8')]
+begintime [aModel.getStartTime()/]
+	[for (anElement : Element | aModel->collect(allOwnedElements()))]
+		[if (not anElement.oclAsType(Classifier).oclIsInvalid() ) ]
+[if (not anElement.oclAsType(Classifier).name.oclIsInvalid())]
+[if (anElement.oclAsType(Classifier).name.toString().contains('contract_'))]
+contract [anElement.oclAsType(Classifier).name.toString().replace('contract_', '')/] {
+				[for (aattr : Property | anElement.oclAsType(Classifier).attribute)]
+    [aattr.type.name/] [aattr.name/];
+				[/for]
+[let c : Class = anElement]
+[for (o : Operation | c.ownedOperation)]
+function [o.name/] ([for (pr : Parameter | o.ownedParameter) separator(', ')
+?(not(pr.direction = ParameterDirectionKind::return))][pr.name/] [pr.type.name/][/for]) public view returns
+([for (pr : Parameter | o.ownedParameter) separator(', ') ?((pr.direction =
+ParameterDirectionKind::return))][pr.type.name/][/for]) {
+}
+[/for]
+[/let]
+}
+[/if]
+[if (anElement.oclAsType(Classifier).name.toString().contains('struct_'))]
+struct [anElement.oclAsType(Classifier).name.toString().replace('struct_', '')/] {
+				[for (aattr : Property | anElement.oclAsType(Classifier).attribute)]
+    [aattr.type.name/] [aattr.name/];
+				[/for]
+}
+[/if]
+[/if]
+		[/if]
+	[/for]
+endtime [aModel.getEndTime()/]
+[/file]
+[/template]

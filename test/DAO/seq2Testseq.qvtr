@@ -1,0 +1,41 @@
+import uml : 'myUML.ecore'::UML; 
+
+transformation org::eclipse::qvtd::examples::qvtrelation::hstm2fstm::qvtrtestseq ( source: uml,  target: uml)  {
+
+top relation generateTestSeq{
+	
+	
+	domain source it : Interaction{
+		name = itname : String{}
+	};
+	enforce domain target testit : Interaction{
+		name = 'Test_' + itname,
+		message = dspmsg : Message {
+			name = 'dsp_' + itname
+	    },
+	    message = dsprmsg : Message {
+	    	messageSort = UML::MessageSort::reply,
+			name = 'reply_parameters'
+	    },
+	    message = dsrmsg : Message {
+			name = 'dsr_' + itname
+	    },
+	    message = dsrrmsg : Message {
+	    	messageSort = UML::MessageSort::reply,
+			name = 'reply_expectedResult'
+	    },
+	    message = realmsg : Message {
+			name = 'call_' + itname
+	    },
+	    message = realrmsg : Message {
+	    	messageSort = UML::MessageSort::reply,
+			name = 'reply_realResult'
+	    },
+	    message = vamsg : Message {
+			name = 'ValidationAction(expectedResult,realResult)'
+	    }
+	};
+
+}
+
+}

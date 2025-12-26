@@ -1,0 +1,23 @@
+<project>
+    <class name="Shipment" access="public">
+        <variable name="shipmentId" type="String" access="private"/>
+        <variable name="foodDetails" type="String" access="private"/>
+        <variable name="quantity" type="int" access="private"/>
+        <method name="getShipmentDetails" returnType="String" access="public"/>
+    </class>
+    
+    <class name="RawFoodMaker" access="public" implements="Role">
+        <method name="createRawFood" returnType="Boolean" access="public"/>
+        <method name="isShipmentSufficient" returnType="Boolean" access="public"/>
+        <method name="sendAlertMessage" returnType="void" access="public"/>
+    </class>
+    
+    <class name="Manufacturer" access="public" implements="Role">
+        <method name="receiveShipment" returnType="boolean" access="public"/>
+        <method name="storeRawFood" returnType="void" access="public"/>
+    </class>
+    
+    <interface name="Role" access="public">
+        <!-- No specific methods in this example, but could be extended -->
+    </interface>
+</project>

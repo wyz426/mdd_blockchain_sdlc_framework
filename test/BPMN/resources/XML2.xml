@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project>
+<class access="public" implements="Role" name="RawFoodMaker">
+<method access="public" name="CreateRawFood" returnType="Boolean"/>
+<method access="public" name="JudgeIsShipmentSuffcient" returnType="Boolean"/>
+<method access="public" name="AlertManufacturer" returnType="void"/>
+</class>
+<class access="public" implements="Role" name="Manufacturer">
+<method access="public" name="ReceiveShipment" returnType="Boolean"/>
+<method access="public" name="StoreRawFood" returnType="void"/>
+</class>
+<class access="public" name="Shipment">
+<method access="public" name="GetShipmentDetails" returnType="String"/>
+<variable access="private" name="shipmentId" type="String"/>
+<variable access="private" name="foodDetails" type="String"/>
+<variable access="private" name="quantity" type="int"/>
+</class>
+<interface access="public" name="Role"/>
+</project>

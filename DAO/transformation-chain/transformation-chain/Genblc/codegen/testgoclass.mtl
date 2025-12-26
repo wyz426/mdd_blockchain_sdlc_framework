@@ -1,0 +1,42 @@
+[module generate('http://www.eclipse.org/uml2/5.0.0/UML')]
+
+[query public getStartTime(c : OclAny) : String =
+invoke('org.eclipse.acceleo.module.solandfab.main.GenerationSupport', 'getStartTime()', Sequence{}) /]
+[query public getEndTime(c : OclAny) : String =
+invoke('org.eclipse.acceleo.module.solandfab.main.GenerationSupport', 'getEndTime()', Sequence{}) /]
+
+[template public testclasstogo(aModel: Model)]
+[file (aModel.name+'test.go', false, 'UTF-8')]
+	[for (anElement : Element | aModel->collect(allOwnedElements()))]
+		[if (not anElement.oclAsType(Classifier).oclIsInvalid() ) ]
+[if (not anElement.oclAsType(Classifier).name.oclIsInvalid())]
+type [anElement.oclAsType(Classifier).name.toString()/] struct {
+
+[for (aattr : Property | anElement.oclAsType(Classifier).attribute)]
+[if (aattr.type.name.toString()='uint')]
+[aattr.name/] int;
+[elseif (aattr.type.name.toString()='address')]
+[aattr.name/] string;
+[else]
+[aattr.name/] [aattr.type.name/];
+[/if]    
+[/for]
+
+}
+
+[for (o : Operation | c.ownedOperation)]
+func (t *[anElement.oclAsType(Classifier).name.toString()/]) [o.name/]([for (pr : Parameter | o.ownedParameter) separator(', ')?(not(pr.direction = ParameterDirectionKind::return))]
+[pr.name/] [pr.type.name/]
+[/for]) {
+
+
+returns ([for (pr : Parameter | o.ownedParameter) separator(', ') ?((pr.direction =
+ParameterDirectionKind::return))][pr.type.name/][/for])
+}
+[/for]
+
+[/if]
+		[/if]
+	[/for]
+[/file]
+[/template]

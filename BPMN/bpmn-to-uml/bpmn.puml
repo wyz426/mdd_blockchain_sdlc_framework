@@ -1,0 +1,10 @@
+@startuml
+class BpmnParser {
+- {static} String namespaceURI
++ {static} Map<String,List<MethodInfo>> parse(String)
+- {static} List<Pair<String,String>> identifyParticipant(Document)
+- {static} List<MethodInfo> identifyProcess(String,String,Document)
+}
+
+
+@enduml

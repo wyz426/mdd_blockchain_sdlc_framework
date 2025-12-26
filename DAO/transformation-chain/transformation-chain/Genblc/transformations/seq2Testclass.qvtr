@@ -1,0 +1,23 @@
+import uml : 'myUML.ecore'::UML; 
+
+transformation org::eclipse::qvtd::examples::qvtrelation::hstm2fstm::qvtrtestclass ( source: uml,  target: uml)  {
+
+top relation generateDatapool{
+	
+	
+	domain source it : Interaction{
+		name = itname : String{}
+	};
+	enforce domain target datapool : Class{
+		name = 'Datapool_' + itname,
+		ownedOperation = dsr : Operation {
+			name = 'dsr_' + itname
+	    },
+	    ownedOperation = ds1 : Operation {
+			name = 'dsp_' + itname
+	    }
+	};
+
+}
+
+}

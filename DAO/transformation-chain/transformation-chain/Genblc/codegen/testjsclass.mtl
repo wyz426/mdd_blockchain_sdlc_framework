@@ -1,0 +1,31 @@
+[module generate('http://www.eclipse.org/uml2/5.0.0/UML')]
+
+[query public getStartTime(c : OclAny) : String =
+invoke('org.eclipse.acceleo.module.solandfab.main.GenerationSupport', 'getStartTime()', Sequence{}) /]
+[query public getEndTime(c : OclAny) : String =
+invoke('org.eclipse.acceleo.module.solandfab.main.GenerationSupport', 'getEndTime()', Sequence{}) /]
+
+[template public testclasstojs(aModel: Model)]
+
+[file (aModel.name+'test.js', false, 'UTF-8')]
+	[for (anElement : Element | aModel->collect(allOwnedElements()))]
+		[if (not anElement.oclAsType(Classifier).oclIsInvalid() ) ]
+[if (not anElement.oclAsType(Classifier).name.oclIsInvalid())]
+class [anElement.oclAsType(Classifier).name.toString()/] {
+constructor([for (aattr : Property | anElement.oclAsType(Classifier).attribute)][aattr.name/], [/for]) {
+				[for (aattr : Property | anElement.oclAsType(Classifier).attribute)]
+    this.[aattr.name/] = [aattr.name/];
+				[/for]
+}
+[let c : Class = anElement]
+[for (o : Operation | c.ownedOperation)]
+[o.name/] () {
+}
+[/for]
+[/let]
+}
+[/if]
+		[/if]
+	[/for]
+[/file]
+[/template]

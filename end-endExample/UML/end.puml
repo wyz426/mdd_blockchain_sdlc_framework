@@ -1,0 +1,31 @@
+@startuml
+class RawFoodMaker {
++ void createRawFood()
++ void checkShipment()
++ void spendShipment()
++ void testMethod()
++ void performRole()
+}
+
+class ShouwMaker {
++ void aaa()
++ void bbb()
++ void performRole()
+}
+
+class Manufacturer {
++ void receiveShipment()
++ void storeRawFood()
++ void performRole()
+}
+
+interface Role {
+~ void performRole()
+}
+
+
+
+Role <|.. RawFoodMaker
+Role <|.. ShouwMaker
+Role <|.. Manufacturer
+@enduml

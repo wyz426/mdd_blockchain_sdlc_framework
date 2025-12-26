@@ -1,0 +1,80 @@
+[module generate('http://www.eclipse.org/uml2/5.0.0/UML')]
+
+[query public getStartTime(c : OclAny) : String =
+invoke('org.eclipse.acceleo.module.solandfab.main.GenerationSupport', 'getStartTime()', Sequence{}) /]
+[query public getEndTime(c : OclAny) : String =
+invoke('org.eclipse.acceleo.module.solandfab.main.GenerationSupport', 'getEndTime()', Sequence{}) /]
+
+[template public seq2gobehavior(ainteraction: Interaction)]
+[file (ainteraction.name+'.go',false,'UTF-8')]
+[for (anfragment :InteractionFragment | ainteraction.fragment)]
+[if (anfragment.oclIsTypeOf(CombinedFragment))]
+[anfragment.eGet('interactionOperator')/]
+[if (anfragment.eGet('interactionOperator').toString() = 'alt')]
+ifelse
+[for (operand : InteractionOperand | anfragment.eContents(InteractionOperand))]
+[altf(operand)/]
+[/for]
+[else]...[/if]
+[elseif (anfragment.oclIsTypeOf(MessageOccurrenceSpecification))]
+[for (aMsg : Message | anfragment.eGet('message'))]
+[dealwithgomsg(aMsg)/]
+[/for]
+[/if]
+[/for]
+[/file]
+[/template]
+
+
+[template public dealwithgomsg(aMsg : Message)]
+[if (not (aMsg.name='null'))]
+[let fname : String = aMsg.name.strtok(':', 0)]
+[let fres : String = aMsg.name.strtok(':', 1)]
+[if (fres='void')]
+[if (fname.startsWith('set(attr="'))]
+[fname.toString().replace('\\(', '').replace('"\\)', '').replace('setattr="', '').replace('",value = "', '=')/]
+[else]
+[fname/]
+[/if]
+[else]
+[if (fname.startsWith('new'))]
+[fres/] = [fname.replace('new ','')/]{}
+[elseif (fname.startsWith('GetState'))]
+[let getstatename : String = fname.replace('\\(', '').replace('\\)', '').replace('GetState', '').strtok(',', 0)]
+[let getstateindex : String = fname.replace('\\(', '').replace('\\)', '').replace('GetState', '').strtok(',', 1)]
+[fres/]Bytes, _ := stub.GetState([getstateindex/])
+json.Unmarshal([fres/]Bytes, &[fres/])
+[/let]
+[/let]
+[elseif (fname.startsWith('PutState'))]
+[let getstatename : String = fres.strtok(',', 0)]
+[let getstateindex : String = fres.strtok(',', 1)]
+[fname.replace('\\(', '').replace('\\)', '').replace('PutState', '')/]Bytes, _ = json.Marshal([fname.replace('\\(', '').replace('\\)', '').replace('PutState', '')/])
+stub.PutState([getstateindex/], [fname.replace('\\(', '').replace('\\)', '').replace('PutState', '')/]Bytes)
+[/let]
+[/let]
+[else]
+[fres/] = [fname/]
+[/if]
+[/if]
+[/let]
+[/let]
+[/if]
+[/template]
+
+
+[template public altf(operand : InteractionOperand)]
+[if (operand.precedingSiblings()->isEmpty())]
+if([operand.guard.specification.stringValue()/]){
+[elseif (operand.followingSiblings()->isEmpty())]
+else{
+[else]
+else if([operand.guard.specification.stringValue()/]){
+[/if][/template]
+
+[template public loopf(operand : InteractionOperand, int : Integer)]
+[if (operand.guard.specification->notEmpty())]for
+([operand.guard.specification.stringValue()/])
+[elseif (operand.guard.minint->notEmpty())]for ['i'+int/] := 0; ['i'+int/]
+<[operand.guard.minint.stringValue()/]; ['i'+int/]++
+[/if]{[/template]

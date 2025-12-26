@@ -1,0 +1,64 @@
+<agents>
+    <agent id="agent1">
+        <name>RawFoodMaker</name>
+        <agenttype>Role</agenttype>
+        <goals>
+            <goal id="goal1">
+                <description>create raw food</description>
+                <type>Boolean</type>
+            </goal>
+            <goal id="goal2">
+                <description>Judge is Shipment suffcient</description>
+                <type>Boolean</type>
+            </goal>
+        </goals>
+        <interactions>
+            <interaction>
+                <partner>Manufacturer</partner>
+                <type>Alert</type>
+                <description>Alert Manufacturer To Receive Shipment</description>
+            </interaction>
+        </interactions>
+        <story>
+            As a RawFoodMaker, I want to create raw food items so that I can provide fresh ingredients for our customers. Additionally, I want to check if the shipment is sufficient; if it's not, I want to send an alert message to notify the team to restock.
+        </story>
+    </agent>
+
+    <agent id="agent2">
+        <name>Manufacturer</name>
+        <agenttype>Role</agenttype>
+        <goals>
+            <goal id="goal1">
+                <description>receive shipment</description>
+                <type>Boolean</type>
+            </goal>
+            <goal id="goal2">
+                <description>store raw food</description>
+            </goal>
+        </goals>
+        <interactions>
+            <interaction>
+                <partner>agent1</partner>
+                <type>Receive</type>
+                <description>receive shipment from RawFoodMaker</description>
+            </interaction>
+        </interactions>
+        <story>
+            As a Manufacturer, I want to receive shipments from the RawFoodMaker so that I can ensure we have the necessary raw ingredients. After receiving the shipment, I want to store the raw food properly to maintain its quality for production.
+        </story>
+    </agent>
+
+    <agent id="agent3">
+        <name>Shipment</name>
+        <goals>
+            <goal id="goal1">
+                <description>get shipment details</description>
+                <message>shipmentId</message>
+                <message>foodDetails</message>
+                <message type="int">quantity</message>
+                <type>String</type>
+            </goal>
+        </goals>
+    </agent>
+
+</agents>

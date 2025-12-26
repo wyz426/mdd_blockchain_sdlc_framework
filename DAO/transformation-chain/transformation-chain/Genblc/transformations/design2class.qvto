@@ -1,0 +1,52 @@
+modeltype uml "strict" uses uml('http://www.eclipse.org/uml2/5.0.0/UML');
+modeltype ObserverPattern "strict" uses uml('http://www.eclipse.org/uml2/5.0.0/UML');
+modeltype Contract "strict" uses uml('http://www.eclipse.org/uml2/5.0.0/UML');
+//transformation qvttest1Transformation(inout model:uml);
+transformation qvttest1Transformation(in srcModel:uml, out destModel:uml);
+
+ //query ObserverPattern::Role.isRolePlayed() Boolean{
+ 	//rp:=self.ownedMember->selsect(p| #RolePlay);
+ 	//return rp->exists(rp.role=self);
+ //}
+
+//intermediate class TempClass extends Class{type: Classifier}
+
+main() {
+//srcModel.rootObjects()[Model]->map Model2Model();
+srcModel.objectsOfType(Dependency)->map Pattern2Logic2ContractClass();
+srcModel.objectsOfType(Interface)->map interface2Contract();
+//srcModel.objectsOfType(TempClass)->map TempClass2ContractClass();
+//model.objects()[Class].map addID();
+}
+
+//mapping Model :: Model2Model() : Model{
+
+//}
+
+mapping Dependency::Pattern2Logic2ContractClass(): Class
+//when{self.name = 'Pattern2Logic'}
+{
+	var _pattern:=self.client.oclAsType(Classifier);
+	var _logic:=self.supplier.oclAsType(Classifier);
+	result.name:='contract_';
+	_logic.name->forEach(i){
+		result.name:= result.name+i.toString();
+	};
+	 result.ownedAttribute:=_pattern.attribute;
+	 result.ownedOperation:=_pattern.getAllOperations();
+	 _logic.attribute->forEach(i){ 
+	 	result.ownedAttribute += i;
+	 };
+	 _logic.getAllOperations()->forEach(i){
+	 	result.ownedOperation += i;
+	 };
+}
+
+mapping Interface::interface2Contract(): Interface
+//when{self.name = 'Pattern2Logic'}
+{
+	result.name:=self.name;
+	result.ownedAttribute:=self.attribute;
+	 result.ownedOperation:=self.getAllOperations();
+	
+}

@@ -1,0 +1,28 @@
+[module generate('http://www.eclipse.org/uml2/5.0.0/UML')]
+
+[query public getStartTime(c : OclAny) : String =
+invoke('org.eclipse.acceleo.module.solandfab.main.GenerationSupport', 'getStartTime()', Sequence{}) /]
+[query public getEndTime(c : OclAny) : String =
+invoke('org.eclipse.acceleo.module.solandfab.main.GenerationSupport', 'getEndTime()', Sequence{}) /]
+
+[template public testseq2gobehavior(aLifeline : Lifeline)]
+[if aLifeline.name.toString().startsWith('TComp_')]
+[file (aLifeline.name.replace('TComp_', '').concat('test.go'), false)]
+begintime [aLifeline.getStartTime()/]
+
+d_[aLifeline.ancestors(Interaction).name/] := new(DataPool_[aLifeline.ancestors(Interaction).name/])
+
+[for ( str : String | aLifeline.ancestors(Interaction).name.tokenize(',') )]
+[str/] := d_[aLifeline.ancestors(Interaction).name/].ds[str/]_[aLifeline.ancestors(Interaction).name/]()
+[/for]
+expectedResult := d_[aLifeline.ancestors(Interaction).name/].dsr_[aLifeline.ancestors(Interaction).name/]()
+res := stub.MockInvoke("1", ['['/][']'/]['['/][']'/]byte{['['/][']'/]byte("[aLifeline.ancestors(Interaction).name/]"),['['/][']'/]byte[aLifeline.ancestors(Interaction).name/]})
+realResult := fetch[aLifeline.ancestors(Interaction).name/]
+if expectedResult != realResult {
+fmt.Println("Error result")
+t.FailNow()
+}
+endtime [aLifeline.getEndTime()/]
+[/file]
+[/if]
+[/template]

@@ -1,0 +1,80 @@
+[module generate('http://www.eclipse.org/uml2/5.0.0/UML')]
+
+[query public getStartTime(c : OclAny) : String =
+invoke('org.eclipse.acceleo.module.solandfab.main.GenerationSupport', 'getStartTime()', Sequence{}) /]
+[query public getEndTime(c : OclAny) : String =
+invoke('org.eclipse.acceleo.module.solandfab.main.GenerationSupport', 'getEndTime()', Sequence{}) /]
+
+[template public tohyperledgergoclass(aModel: Model)]
+[file (aModel.name+'model.go', false, 'UTF-8')]
+begintime [aModel.getStartTime()/]
+package main
+import "github.com/hyperledger/fabric-chaincode-go/shim"
+	[for (anElement : Element | aModel->collect(allOwnedElements()))]
+		[if (not anElement.oclAsType(Classifier).oclIsInvalid() ) ]
+[if (not anElement.oclAsType(Classifier).name.oclIsInvalid())]
+[if (anElement.oclAsType(Classifier).name.toString().contains('contract_'))]
+type [anElement.oclAsType(Classifier).name.toString().replace('contract_', '')/] struct {
+}
+func (t *[anElement.oclAsType(Classifier).name.toString().replace('contract_', '')/]) Init(stub shim.ChaincodeStubInterface) pb.Response {
+[for (aattr : Property | anElement.oclAsType(Classifier).attribute)]
+[if (aattr.type.name.toString()='uint')]
+[aattr.name/] int;
+[elseif (aattr.type.name.toString()='address')]
+[aattr.name/] string;
+[else]
+[aattr.name/] [aattr.type.name/];
+[/if]    
+[/for]
+}
+
+func (t *[anElement.oclAsType(Classifier).name.toString().replace('contract_', '')/]) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
+	function, args := stub.GetFunctionAndParameters()
+	if function == "query" {
+		return t.query(stub, args)
+	}
+[let c : Class = anElement]
+[for (o : Operation | c.ownedOperation)]
+	else if function == "[o.name/]" {
+		return t.[o.name/](stub, args)
+	} 
+[/for]
+	return shim.Error("Invalid function name")
+}
+[for (o : Operation | c.ownedOperation)]
+func (t *[anElement.oclAsType(Classifier).name.toString().replace('contract_', '')/]) [o.name/](stub shim.ChaincodeStubInterface, args ['[]'/]string) pb.Response {
+[for (pr : Parameter | o.ownedParameter) separator(', ')?(not(pr.direction = ParameterDirectionKind::return))]
+var [pr.type.name/] [pr.name/]
+[/for]
+returns ([for (pr : Parameter | o.ownedParameter) separator(', ') ?((pr.direction =
+ParameterDirectionKind::return))][pr.type.name/][/for])
+}
+[/for]
+[/let]
+func main() {
+
+	err := shim.Start(new([anElement.oclAsType(Classifier).name.toString().replace('contract_', '')/]))
+	if err != nil {
+		fmt.Printf("Error creating new Contract: %s", err)
+	}
+}
+[/if]
+[if (anElement.oclAsType(Classifier).name.toString().replace('CopyOf_', '').contains('struct_'))]
+type [anElement.oclAsType(Classifier).name.toString().replace('struct_', '')/] struct {
+				[for (aattr : Property | anElement.oclAsType(Classifier).attribute)]
+[if (aattr.type.name.toString()='uint')]
+[aattr.name/] int;
+[elseif (aattr.type.name.toString()='address')]
+[aattr.name/] string;
+[else]
+[aattr.name/] [aattr.type.name/];
+[/if]    
+				[/for]
+}
+[/if]
+[/if]
+		[/if]
+	[/for]
+endtime [aModel.getEndTime()/]
+[/file]
+[/template]
